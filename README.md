@@ -11,7 +11,7 @@
    app@my_vm:# docker run --name postgres_pgrouting_pwd -e POSTGRES_PASSWORD=pgRouting168 -d starefossen/pgrouting
    ```
 
-2. Donwload [data bundle](http://files.boundlessgeo.com/workshopmaterials/postgis-workshop-201401.zip) and take alook at the [data introduction](http://workshops.boundlessgeo.com/postgis-intro/about_data.html)
+2. Download [data bundle](http://files.boundlessgeo.com/workshopmaterials/postgis-workshop-201401.zip) and read the [data introduction](http://workshops.boundlessgeo.com/postgis-intro/about_data.html)
 
 3. Copy data into the container
 
@@ -35,6 +35,8 @@
    Or (for pgRouting example)
 
    ```
+   root@my_container:# apt-get install gdal-bin
+
    root@my_container:# ogr2ogr -where "highway <> ''" -select 'name,highway,oneway,surface' -lco GEOMETRY=the_geom -lco FID=id -t_srs EPSG:3857 -f PostgreSQL PG:"dbname=routing user=postgres password=pgRouting168" -nln edges portland_maine.osm-line.shp
 
    edges=# ALTER TABLE public.edges RENAME COLUMN wkb_geometry TO the_geom; 
