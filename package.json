@@ -1,0 +1,32 @@
+{
+  "name": "boundlessgeo_app",
+  "version": "1.0.0",
+  "description": "pgRouting demo with Node.js, Postgres, pgRounting, etc",
+  "main": "server.js",
+  "scripts": {
+    "test": "./script/test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Gogistics/prjPGRoutingDemo.git"
+  },
+  "keywords": [
+    "Node.js",
+    "Postgres",
+    "pgRouting",
+    "PostGIS"
+  ],
+  "author": "Postgres Node",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Gogistics/prjPGRoutingDemo/issues"
+  },
+  "homepage": "https://github.com/Gogistics/prjPGRoutingDemo#readme",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0",
+    "jade": "^1.11.0",
+    "jquery": "^1.12.0",
+    "pg": "^6.1.0"
+  }
+}
