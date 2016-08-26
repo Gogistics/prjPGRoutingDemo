@@ -155,6 +155,110 @@
    geo_test=# SELECT e.old_id AS id, e.name, e.type, e.oneway, sum(e.time) AS time, sum(e.distance) AS distance FROM pgr_dijkstra('SELECT id::INT4, source::INT4, target::INT4, time AS cost, CASE oneway WHEN ''yes'' THEN -1 ELSE time END AS reverse_cost FROM edges_noded', 500, 300, true, true) AS r, edges_noded AS e WHERE r.id2 = e.id GROUP BY e.old_id, e.name, e.type, e.oneway ORDER BY time;
    ```
 
+6. Nearest-Neighbour Searching and Shortest Path Search
+
+   Nearest Point Search-
+
+   Result will be used as **source** in Shortest Path Search
+
+   ```
+   SELECT
+
+     v.id,
+
+     v.the_geom,
+
+     e.source,
+
+     e.target,
+
+     string_agg(distinct(e.name),',') AS name
+
+   FROM
+
+     edges_noded_vertices_pgr AS v,
+
+     edges_noded AS e
+
+   WHERE
+
+     v.id = (SELECT
+
+               id
+
+             FROM edges_noded_vertices_pgr
+
+             ORDER BY the_geom <-> ST_SetSRID( ST_Transform( ST_SetSRID(ST_MakePoint(-122.386985, 37.591391),4326) , 3857 ), 3857) LIMIT 1)
+
+   AND (e.source = v.id OR e.target = v.id)
+
+   GROUP BY v.id, v.the_geom, e.source, e.target;
+   ```
+
+   Result will be used as **target** in Shortest Path Search
+
+   ```
+   SELECT
+
+     v.id,
+
+     v.the_geom,
+
+     e.source,
+
+     e.target,
+
+     string_agg(distinct(e.name),',') AS name
+
+   FROM
+
+     edges_noded_vertices_pgr AS v,
+
+     edges_noded AS e
+
+   WHERE
+
+     v.id = (SELECT
+
+               id
+
+             FROM edges_noded_vertices_pgr
+
+             ORDER BY the_geom <-> ST_SetSRID( ST_Transform( ST_SetSRID(ST_MakePoint(-122.406040, 37.629400),4326) , 3857 ), 3857) LIMIT 1)
+
+   AND (e.source = v.id OR e.target = v.id)
+
+   GROUP BY v.id, v.the_geom, e.source, e.target;
+   ```
+
+   Shorest Path Search-
+
+   ```
+   SELECT
+
+     min(r.seq) AS seq,
+
+     e.old_id::INT4 AS id,
+
+     e.name,
+
+     e.type,
+
+     e.oneway,
+
+     sum(e.time) AS time,
+
+     sum(e.distance) AS distance,
+
+   ST_AsText (ST_Transform ( ST_Collect(e.the_geom), 4326)) AS geom
+
+   FROM pgr_dijkstra('SELECT id::INT4, source::INT4, target::INT4, time AS cost, CASE oneway WHEN ''yes'' THEN -1 ELSE time END AS reverse_cost FROM edges_noded', 36543, 30544, true, true) AS r, edges_noded AS e
+   
+   WHERE r.id2 = e.id
+
+   GROUP BY e.old_id, e.name, e.type, e.oneway;
+   ```
+
 
 Ref.
 
@@ -171,5 +275,7 @@ Ref.
 [PostGIS Workshop-1](http://workshops.boundlessgeo.com/postgis-intro/)
 
 [PostGIS Workshop-2](http://workshops.boundlessgeo.com/)
+
+[PostGIS Workshop-3](http://workshops.boundlessgeo.com/tutorial-routing/)
 
 [docker cp](https://docs.docker.com/engine/reference/commandline/cp/)
