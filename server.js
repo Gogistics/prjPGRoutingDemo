@@ -50,5 +50,48 @@ app.post('/query-routing', function(req, res){
   });
 });
 
-app.listen(PORT)
-console.log('Running at port:' + PORT);
+app.post('/query-nearest-neighbor', function(req, res){
+  var lat = req.body.lat,
+      lng = req.body.lng;
+
+  if(lat && lng){
+    searchNearestPoint(lat, lng, function(status_code, results){
+      res.status(status_code).json(results);
+    });
+  }else{
+    res.status(500).json({message: 'wrong lat and lng'});
+  }
+});
+
+function searchNearestPoint(arg_lat, arg_lng, callback){
+  var results = [];
+  client.connect(function(err, client, done){
+    if(err){
+      console.log(err);
+      callback(500, {success: false, data: err});
+    }
+
+    var query_str = "SELECT v.id, ST_AsText (ST_Transform (v.the_geom, 4326)), e.source, e.target, string_agg(distinct(e.name),',') AS name FROM edges_noded_vertices_pgr AS v, edges_noded AS e WHERE v.id = (SELECT id FROM edges_noded_vertices_pgr ORDER BY the_geom <-> ST_SetSRID( ST_Transform( ST_SetSRID(ST_MakePoint(" + arg_lat + ", " + arg_lng + "),4326) , 3857 ), 3857) LIMIT 1) AND (e.source = v.id OR e.target = v.id) GROUP BY v.id, v.the_geom, e.source, e.target LIMIT 1;";
+    var query = client.query(query_str);
+
+    // Stream results back one row at a time
+    query.on('row', function(row) {
+      console.log(row);
+      results.push(row);
+    });
+
+    // After all data is returned, close connection and return results
+    query.on('end', function() {
+      console.log('done...results will be return ASAP');
+      callback(200, results);
+    });
+  });
+}
+
+function searchShortestPath(arg_source, arg_target){
+  //
+}
+
+app.listen(PORT, function(){
+  console.log('Running at port:' + PORT);
+});
