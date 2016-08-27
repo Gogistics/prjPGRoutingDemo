@@ -18,7 +18,7 @@
    ```
    app@my_vm:# docker cp <SRC_PATH> <CONTAINER>:<DEST_PATH>
    ```
-4. Go into container and repeatly convert and import .shp files into PostgresDB
+4. Get into the container and repeatly convert and import .shp files into PostgresDB
 
    ```
    app@my_vm:# docker exec -it <YOUR_CONTAINER_NAME> bash
@@ -192,7 +192,7 @@
 
    AND (e.source = v.id OR e.target = v.id)
 
-   GROUP BY v.id, v.the_geom, e.source, e.target;
+   GROUP BY v.id, v.the_geom, e.source, e.target LIMIT 1;
    ```
 
    Result will be used as **target** in Shortest Path Search
@@ -228,7 +228,7 @@
 
    AND (e.source = v.id OR e.target = v.id)
 
-   GROUP BY v.id, v.the_geom, e.source, e.target;
+   GROUP BY v.id, v.the_geom, e.source, e.target LIMIT 1;
    ```
 
    Shorest Path Search-
@@ -267,6 +267,8 @@ Ref.
 [pgRouting Manual- pgr_createTopology](http://docs.pgrouting.org/2.2/en/src/topology/doc/pgr_createTopology.html)
 
 [pgrouting Manual- pgr_dijkstra](http://docs.pgrouting.org/2.0/en/src/dijkstra/doc/index.html)
+
+[Nearest-Neighbour Searching](http://workshops.boundlessgeo.com/postgis-intro/knn.html#index-based-knn)
 
 [Docker pgRouting Image](https://github.com/Starefossen/docker-pgrouting)
 
