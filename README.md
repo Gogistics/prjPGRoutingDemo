@@ -162,6 +162,8 @@
    Result will be used as **source** in Shortest Path Search
 
    ```
+   DROP TABLE IF EXISTS temp_source;
+
    SELECT
 
      v.id,
@@ -173,6 +175,8 @@
      e.target,
 
      string_agg(distinct(e.name),',') AS name
+   
+   INTO temp_source
 
    FROM
 
@@ -198,6 +202,8 @@
    Result will be used as **target** in Shortest Path Search
 
    ```
+   DROP TABLE IF EXISTS temp_target;
+
    SELECT
 
      v.id,
@@ -209,6 +215,8 @@
      e.target,
 
      string_agg(distinct(e.name),',') AS name
+
+   INTO temp_target
 
    FROM
 
@@ -250,9 +258,9 @@
 
      sum(e.distance) AS distance,
 
-   ST_AsText (ST_Transform ( ST_Collect(e.the_geom), 4326)) AS geom
+   ST_AsGeoJSON (ST_Transform ( ST_Collect(e.the_geom), 4326)) AS geom
 
-   FROM pgr_dijkstra('SELECT id::INT4, source::INT4, target::INT4, time AS cost, CASE oneway WHEN ''yes'' THEN -1 ELSE time END AS reverse_cost FROM edges_noded', 36543, 30544, true, true) AS r, edges_noded AS e
+   FROM pgr_dijkstra('SELECT id::INT4, source::INT4, target::INT4, time AS cost, CASE oneway WHEN ''yes'' THEN -1 ELSE time END AS reverse_cost FROM edges_noded', (SELECT source FROM temp_source), (SELECT target FROM temp_target), true, true) AS r, edges_noded AS e
    
    WHERE r.id2 = e.id
 
