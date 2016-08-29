@@ -159,7 +159,7 @@
 
    Nearest Point Search-
 
-   Result will be used as **source** in Shortest Path Search
+   Result will be used as **source** in Shortest Path Search. EX: curl --data "lat=-122.386985&lng=37.591391" http://45.79.106.150:5300/query-nearest-neighbor
 
    ```
    DROP TABLE IF EXISTS temp_source;
@@ -199,7 +199,7 @@
    GROUP BY v.id, v.the_geom, e.source, e.target LIMIT 1;
    ```
 
-   Result will be used as **target** in Shortest Path Search
+   Result will be used as **target** in Shortest Path Search. EX: curl --data "lat=-122.406040&lng=37.629400" http://45.79.106.150:5300/query-nearest-neighbor
 
    ```
    DROP TABLE IF EXISTS temp_target;
@@ -240,6 +240,8 @@
    ```
 
    Shorest Path Search-
+
+   Results will sent to frontend and rendered on OpenStreetMap. EX: curl -H "Content-Type: application/json" -X POST -d '{"source_lat":"-122.386985","source_lng":"37.591391","target_lat":"-122.418700","target_lng":"37.620297"}' http://45.79.106.150:5300/query-shortest-path
 
    ```
    SELECT
