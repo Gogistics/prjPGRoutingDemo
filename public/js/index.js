@@ -31,10 +31,8 @@
     });
 
     window.indexApp.factory('leafletMap', function(){
-      var mapboxTiles = L.tileLayer('https://{s}.tiles.mapbox.com/v3/examples.map-zr0njcqy/{z}/{x}/{y}.png', {
-        attribution: '<a href="http://www.mapbox.com/about/maps/" target="_blank">Terms &amp; Feedback</a>'
-      });
-      return L.map('map').addLayer(mapboxTiles);
+      var leafletMapTiles = new L.TileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png');
+      return new L.Map('map', {center: [37.615419, -122.391106], zoom: 12}).addLayer(leafletMapTiles);
     });
 
     window.indexApp.service('dataProvider', function($http, APP_VALUES){
@@ -46,7 +44,7 @@
     window.indexApp.controller('indexCtrl', ['$scope', 'leafletMap', 'dataProvider', function($scope, leafletMap, dataProvider){
       var ctrl = this;
       ctrlinit = function(){
-        leafletMap.setView([-122.391106, 37.615419], 14);
+        leafletMap.on("viewreset", reset);
       }
       console.log('index ctrl is ready');
     }]);

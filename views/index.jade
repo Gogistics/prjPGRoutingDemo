@@ -3,7 +3,6 @@ extends base
 block css_block
   // required css files
   link(href='/public/css/leaflet-0.7.css' type='text/css' rel='stylesheet')
-  link(href='/public/css/mapbox-1.6.4.css' type='text/css' rel='stylesheet')
   link(href='/public/css/index.min.css' type='text/css' rel='stylesheet')
 
 block content
@@ -19,13 +18,11 @@ block js_block
   // for IE 11 or browser is not IE
   script(type="text/javascript" src="/public/js/d3.v3.min.js")
   script(type="text/javascript" src="/public/js/leaflet-0.7.js")
-  script(type="text/javascript" src="/public/js/mapbox-1.6.4.js")
   script(type="text/javascript" src="/public/js/index.min.js")
 
   // for lt IE 9
   <!--[if lt IE 9]>
   <script type="text/javascript" src="/public/js/d3.v3.min.js"></script>
   <script type="text/javascript" src="/public/js/leaflet-0.7.js"></script>
-  <script type="text/javascript" src="/public/js/mapbox-1.6.4.js"></script>
   <script type="text/javascript" src="/public/js/index.min.js"></script>
   <![endif]-->
