@@ -65,10 +65,10 @@
       };
     });
 
-    window.indexApp.controller('indexCtrl', ['$scope', 'APP_VALUES', 'leafletMap', 'dataProvider', function($scope, APP_VALUES, leafletMap, dataProvider){
+    window.indexApp.controller('indexCtrl', ['$scope', '$window', 'APP_VALUES', 'leafletMap', 'dataProvider', function($scope, $window, APP_VALUES, leafletMap, dataProvider){
       var ctrl = this;
-      ctrl.sourceLatLng = {};
-      ctrl.targetLatLng = {};
+      ctrl.sourceLatLng = {lat: null, lng: null};
+      ctrl.targetLatLng = {lat: null, lng: null};
 
       ctrl.init = function(){
         ctrl.svg = d3.select(leafletMap.getPanes().overlayPane).append('svg');
@@ -79,15 +79,16 @@
         // get data
         var customHeaders = { 'current_cookie': $window.document.cookie,
                               'Content-Type': 'application/json'},
-            dataSet = { source_lat: sourceLatLng.lat,
-                        source_lng: sourceLatLng.lng,
-                        target_lat: targetLatLng.lat,
-                        target_lng: targetLatLng.lng};
+            dataSet = { source_lat: ctrl.sourceLatLng.lat,
+                        source_lng: ctrl.sourceLatLng.lng,
+                        target_lat: ctrl.targetLatLng.lat,
+                        target_lng: ctrl.targetLatLng.lng};
 
         // getData() for testing; geoQuery() for query
         dataProvider.getData('/public/data/points.geojson', customHeaders, dataSet)
                     .success(function(data, status, headers, config){
-                      if(!!data.request_status) ctrl.renderMapRoute(data.geoJson);
+                      console.log(data);
+                      if(data) ctrl.renderMapRoute(data);
                     })
                     .error(function(data, status, headers, config){
                       console.log('Something went wrong!')
@@ -102,8 +103,10 @@
                     });
         */
       }
+      ctrl.submitGeoQuery();
 
-      ctrl.renderMapRoute = function(arg_data){
+      ctrl.renderMapRoute = function(arg_collection){
+        var arg_data = arg_collection.features;
         // render map
         var transform = d3.geo.transform({point: projectPoint}),
             d3path = d3.geo.path().projection(transform);
@@ -163,12 +166,12 @@
                         return -10;
                       });
 
-        leafletMap.on('viewreset', reset);
+       leafletMap.on('viewreset', reset);
         reset();
         transition();
 
         function reset(){
-          var bounds = d3path.bounds(arg_data),
+          var bounds = d3path.bounds(arg_collection),
           topLeft = bounds[0],
           bottomRight = bounds[1];
 
@@ -187,7 +190,7 @@
           marker.attr('transform', function(){
             var y = arg_data[0].geometry.coordinates[1],
                 x = arg_data[0].geometry.coordinates[0],
-                latLng = leafletMap.latlngToLayerPoint(new L.LatLng(y, x));
+                latLng = leafletMap.latLngToLayerPoint(new L.LatLng(y, x));
             return 'translate(' + latLng.x + ',' + latLng.y + ')';
           });
 
@@ -217,20 +220,20 @@
             var marker = d3.select('marker');
             var p = linePath.node().getPointAtLength(t * l);
             marker.attr('transform', 'translate(' + p.x + ',' + p.y + ')');
-            console.log(interpolate(t));
+            // console.log(interpolate(t));
             return interpolate(t);
           }
         }
 
         function projectPoint(x, y){
-          var point = leafletMap.latlngToLayerPoint(new L.LatLng(y,x));
+          var point = leafletMap.latLngToLayerPoint(new L.LatLng(y,x));
           this.stream.point(point.x, point.y);
         }
 
         function applyLatLngToLayer(d){
           var y = d.geometry.coordinates[1];
           var x = d.geometry.coordinates[0];
-          return leafletMap.latlngToLayerPoint(new L.LatLng(y, x));
+          return leafletMap.latLngToLayerPoint(new L.LatLng(y, x));
         }
       }
 
