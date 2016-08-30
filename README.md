@@ -291,3 +291,5 @@ Ref.
 [PostGIS Workshop-3](http://workshops.boundlessgeo.com/tutorial-routing/)
 
 [docker cp](https://docs.docker.com/engine/reference/commandline/cp/)
+
+[Animation with D3 and Leaflet](http://zevross.com/blog/2014/09/30/use-the-amazing-d3-library-to-animate-a-path-on-a-leaflet-map/)
