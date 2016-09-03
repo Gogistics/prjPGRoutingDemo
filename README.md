@@ -1,4 +1,4 @@
-# PostGIS Tutorial based on BoundlessGeo Documents
+# PostGIS Tutorial based on Boundless Documents
 
 1. Create Postgres and Postgis containers
    ```
@@ -268,6 +268,8 @@
 
    GROUP BY e.old_id, e.name, e.type, e.oneway;
    ```
+
+7. Start to construct the front-end map with D3 and Leaflet.js (Zevross provides a good example). In this demo, angular.js is used to construct the front-end MVC architecture.
 
 
 Ref.
