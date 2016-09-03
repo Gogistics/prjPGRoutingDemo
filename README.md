@@ -241,7 +241,7 @@
 
    Shorest Path Search-
 
-   Results will sent to frontend and rendered on OpenStreetMap. EX: curl -H "Content-Type: application/json" -X POST -d '{"source_lat":"-122.386985","source_lng":"37.591391","target_lat":"-122.418700","target_lng":"37.620297"}' http://45.79.106.150:5300/query-shortest-path
+   Results will sent to frontend and rendered on OpenStreetMap. EX: curl -H "Content-Type: application/json" -X POST -d '{"source_lat":"37.591391","source_lng":"-122.386985","target_lat":"37.620297","target_lng":"-122.418700"}' http://45.79.106.150:5300/query-shortest-path
 
    ```
    SELECT
