@@ -28,7 +28,7 @@ app.use(body_parser.urlencoded({ extended: false }));
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
 app.get('/', function(req, res){
-  res.render('index.jade', {title: 'pRouting Demo'});
+  res.render('index.jade', {title: 'pgRouting Demo'});
 });
 
 app.post('/query-routing', function(req, res){
