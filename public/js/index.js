@@ -76,6 +76,14 @@
         ctrl.assetLayerGroup = new L.LayerGroup();
       };
 
+      ctrl.resetD3Svg = function(){
+        var d3Svg = d3.select('svg');
+        if (!!d3Svg){
+          d3Svg.remove();
+          ctrl.init();
+        }
+      }
+
       ctrl.submitGeoQuery = function(){
         // get data
         var customHeaders = { 'current_cookie': $window.document.cookie,
@@ -124,7 +132,7 @@
       }
 
       ctrl.renderMapRoute = function(arg_collection, arg_max_min_lat_lng){
-        if(!!ctrl.assetLayerGroup) ctrl.assetLayerGroup.clearLayers();
+        ctrl.resetD3Svg();
 
         leafletMap.setView({lat: ( (Number(arg_max_min_lat_lng.maxLat) + Number(arg_max_min_lat_lng.minLat)) / 2).toFixed(5),
                             lng: ( (Number(arg_max_min_lat_lng.maxLng) + Number(arg_max_min_lat_lng.minLng)) / 2).toFixed(5) }, 13);
@@ -142,7 +150,6 @@
                       .y(function(d){
                         return applyLatLngToLayer(d).y;
                       });
-        ctrl.assetLayerGroup.addLayer(toLine);
 
         var ptFeatures = ctrl.g
                             .selectAll('circle')
@@ -151,7 +158,6 @@
                             .append('circle')
                             .attr('r', 3)
                             .attr('class', 'waypoints');
-        ctrl.assetLayerGroup.addLayer(ptFeatures);
 
         var linePath = ctrl.g
                           .selectAll('.lineConnect')
@@ -159,14 +165,12 @@
                           .enter()
                           .append('path')
                           .attr('class', 'lineConnect');
-        ctrl.assetLayerGroup.addLayer(linePath);
 
         var marker = ctrl.g
                         .append('circle')
                         .attr('r', 10)
                         .attr('id', 'marker')
                         .attr('class', 'travelMarker');
-        ctrl.assetLayerGroup.addLayer(marker);
 
         var originAndDestination = [arg_data[0], arg_data[arg_data.length - 1]];
         var begend = ctrl.g
@@ -177,7 +181,6 @@
                         .attr('r', 5)
                         .style('fill', 'red')
                         .style('opacity', '.9');
-        ctrl.assetLayerGroup.addLayer(begend);
 
         var text = ctrl.g
                       .selectAll('text')
@@ -191,7 +194,6 @@
                       .attr('y', function(d){
                         return -10;
                       });
-        ctrl.assetLayerGroup.addLayer(text);
 
        leafletMap.on('viewreset', reset);
         reset();
