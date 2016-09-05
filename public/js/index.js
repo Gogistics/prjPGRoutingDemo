@@ -67,8 +67,8 @@
 
     window.indexApp.controller('indexCtrl', ['$scope', '$window', 'APP_VALUES', 'leafletMap', 'dataProvider', function($scope, $window, APP_VALUES, leafletMap, dataProvider){
       var ctrl = this;
-      ctrl.sourceLatLng = {lat: null, lng: null};
-      ctrl.targetLatLng = {lat: null, lng: null};
+      ctrl.sourceLatLng = {lat: 37.899182, lng: -122.504592};
+      ctrl.targetLatLng = {lat: 37.907919, lng: -122.528024};
 
       ctrl.init = function(){
         ctrl.svg = d3.select(leafletMap.getPanes().overlayPane).append('svg');
@@ -210,8 +210,8 @@
                   .duration(7500)
                   .attrTween('stroke-dasharray', tweenDash)
                   .each('end', function(d){
-                    console.log(d);
-                    d3.select(this).call(transition);
+                    console.log('Your route is ready, enjoy!');
+                    // d3.select(this).call(transition);
                   });
         }
 
