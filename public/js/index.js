@@ -67,8 +67,8 @@
 
     window.indexApp.controller('indexCtrl', ['$scope', '$window', 'APP_VALUES', 'leafletMap', 'dataProvider', function($scope, $window, APP_VALUES, leafletMap, dataProvider){
       var ctrl = this;
-      ctrl.sourceLatLng = {lat: 37.899182, lng: -122.504592};
-      ctrl.targetLatLng = {lat: 37.907919, lng: -122.528024};
+      ctrl.sourceLatLng = {lat: 37.783631, lng: -122.439514};
+      ctrl.targetLatLng = {lat: 37.734909, lng: -122.466637};
 
       ctrl.init = function(){
         ctrl.svg = d3.select(leafletMap.getPanes().overlayPane).append('svg');
@@ -107,7 +107,7 @@
 
                         for(var ith = 0, max_ith = data.length; ith < max_ith; ith++){
                           var geom = JSON.parse(data[ith]['geom']),
-                              lineData = geom[0];
+                              lineData = geom['coordinates'][0];
                           for(var jth = 0, max_jth = lineData.length; jth < max_jth; jth++){
                             // set data
                             if (!maxLat || lineData[jth][1] > maxLat) maxLat = lineData[jth][1];
@@ -136,7 +136,7 @@
 
       ctrl.renderMapRoute = function(arg_collection, arg_max_min_lat_lng){
         leafletMap.setView({lat: ( (Number(arg_max_min_lat_lng.maxLat) + Number(arg_max_min_lat_lng.minLat)) / 2).toFixed(5),
-                            lng: ( (Number(arg_max_min_lat_lng.maxLng) + Number(arg_max_min_lat_lng.minLng)) / 2).toFixed(5) }, 15);
+                            lng: ( (Number(arg_max_min_lat_lng.maxLng) + Number(arg_max_min_lat_lng.minLng)) / 2).toFixed(5) }, 13);
         var arg_data = arg_collection.features;
         // render map
         var transform = d3.geo.transform({point: projectPoint}),
@@ -249,7 +249,7 @@
           return function(t){
             var l = linePath.node().getTotalLength();
             interpolate = d3.interpolateString('0,' + l, l + ',' + l);
-            var marker = d3.select('marker');
+            var marker = d3.select('#marker');
             var p = linePath.node().getPointAtLength(t * l);
             marker.attr('transform', 'translate(' + p.x + ',' + p.y + ')');
             // console.log(interpolate(t));
