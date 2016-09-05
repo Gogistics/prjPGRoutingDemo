@@ -103,24 +103,28 @@
                       if(!!data){
                         var newData = { "type": "FeatureCollection",
                                         "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
-                                        "features": []}, maxLat, maxLng, minLat, minLng;
+                                        "features": []}, maxLat, maxLng, minLat, minLng, count = 0;
 
-                        for(var ith = 0, max = data.length; ith < max; ith++){
-                          var geom = JSON.parse(data[ith]['geom']);
-                          console.log(geom);
-                          if (!maxLat || geom['coordinates'][0][0][1] > maxLat) maxLat = geom['coordinates'][0][0][1];
-                          if (!maxLng || geom['coordinates'][0][0][0] > maxLng) maxLng = geom['coordinates'][0][0][0];
-                          if (!minLat || geom['coordinates'][0][0][1] < minLat) minLat = geom['coordinates'][0][0][1];
-                          if (!minLng || geom['coordinates'][0][0][0] < minLng) minLng = geom['coordinates'][0][0][0];
+                        for(var ith = 0, max_ith = data.length; ith < max_ith; ith++){
+                          var geom = JSON.parse(data[ith]['geom']),
+                              lineData = geom[0];
+                          for(var jth = 0, max_jth = lineData.length; jth < max_jth; jth++){
+                            // set data
+                            if (!maxLat || lineData[jth][1] > maxLat) maxLat = lineData[jth][1];
+                            if (!maxLng || lineData[jth][0] > maxLng) maxLng = lineData[jth][0];
+                            if (!minLat || lineData[jth][1] < minLat) minLat = lineData[jth][1];
+                            if (!minLng || lineData[jth][0] < minLng) minLng = lineData[jth][0];
 
-                          newData['features'].push({type: 'Feature',
-                                                    properties: { latitude: geom['coordinates'][0][0][1],
-                                                                  longitude: geom['coordinates'][0][0][0],
-                                                                  time: (ith + 1),
-                                                                  id: 'route',
-                                                                  name: data[ith]['name'] },
-                                                    geometry: { type: 'Point',
-                                                                coordinates: [geom['coordinates'][0][0][0], geom['coordinates'][0][0][1]]}});
+                            newData['features'].push({type: 'Feature',
+                                                      properties: { latitude: lineData[jth][1],
+                                                                    longitude: lineData[jth][0],
+                                                                    time: (count + 1),
+                                                                    id: 'route',
+                                                                    name: data[ith]['name'] },
+                                                      geometry: { type: 'Point',
+                                                                  coordinates: [lineData[jth][0], lineData[jth][1]]}});
+                            ++count;
+                          }
                         }
                         ctrl.renderMapRoute(newData, {maxLat: maxLat, maxLng: maxLng, minLat: minLat, minLng: minLng});
                       }
