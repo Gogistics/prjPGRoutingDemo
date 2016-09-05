@@ -88,20 +88,21 @@
         dataProvider.getData('/public/data/points.geojson', customHeaders, dataSet)
                     .success(function(data, status, headers, config){
                       console.log(data);
-                      if(data) ctrl.renderMapRoute(data);
+                      if(!!data) ctrl.renderMapRoute(data);
                     })
                     .error(function(data, status, headers, config){
                       console.log('Something went wrong!')
                     });
-        /*
+
+        // 
         dataProvider.geoQuery('/query-shortest-path', customHeaders, dataSet)
                     .success(function(data, status, headers, config){
-                      if(!!data.request_status) ctrl.renderMapRoute(data.geoJson);
+                      console.log(data);
+                      // if(!!data.request_status) ctrl.renderMapRoute(data.geoJson);
                     })
                     .error(function(data, status, headers, config){
                       console.log('Something went wrong!')
                     });
-        */
       }
       ctrl.submitGeoQuery();
 
@@ -208,7 +209,8 @@
           linePath.transition()
                   .duration(7500)
                   .attrTween('stroke-dasharray', tweenDash)
-                  .each('end', function(){
+                  .each('end', function(d){
+                    console.log(d);
                     d3.select(this).call(transition);
                   });
         }
