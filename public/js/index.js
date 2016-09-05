@@ -43,7 +43,7 @@
 
     window.indexApp.factory('leafletMap', function(){
       var leafletMapTiles = new L.TileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png');
-      return new L.Map('map', {center: [40.7233, -73.9901], zoom: 14}).addLayer(leafletMapTiles);
+      return new L.Map('map', {center: [37.77166, -122.44889], zoom: 14}).addLayer(leafletMapTiles);
     });
 
     window.indexApp.service('dataProvider', function($http, APP_VALUES){
@@ -67,9 +67,27 @@
 
     window.indexApp.controller('indexCtrl', ['$scope', '$window', 'APP_VALUES', 'leafletMap', 'dataProvider', function($scope, $window, APP_VALUES, leafletMap, dataProvider){
       var ctrl = this;
-      ctrl.sourceLatLng = {lat: 37.783631, lng: -122.439514};
-      ctrl.targetLatLng = {lat: 37.734909, lng: -122.466637};
+      ctrl.sourceLatLng = {lat: 37.783631, lng: -122.439514, selected: true};
+      ctrl.targetLatLng = {lat: 37.734909, lng: -122.466637, selected: false};
+      ctrl.clickedSourceTargetLatLng = {source: {selected: true, latLng: {lat: null, lng: null}},
+                                        target: {selected: false, latLng: {lat: null, lng: null}}};
 
+      leafletMap.on('click', function(e){
+        if(ctrl.sourceLatLng.selected){
+          ctrl.sourceLatLng.lat = e.latlng.lat.toFixed(5);
+          ctrl.sourceLatLng.lng = e.latlng.lng.toFixed(5);
+          ctrl.sourceLatLng.selected = !ctrl.sourceLatLng.selected;
+          ctrl.targetLatLng.selected = !ctrl.targetLatLng.selected;
+          angular.element('#sourceLatLng').val(ctrl.sourceLatLng.lat + ',' + ctrl.sourceLatLng.lng);
+        }else if(ctrl.targetLatLng.selected){
+          ctrl.targetLatLng.lat = e.latlng.lat.toFixed(5);
+          ctrl.targetLatLng.lng = e.latlng.lng.toFixed(5);
+          ctrl.sourceLatLng.selected = !ctrl.sourceLatLng.selected;
+          ctrl.targetLatLng.selected = !ctrl.targetLatLng.selected;
+          angular.element('#targetLatLng').val(ctrl.targetLatLng.lat + ',' + ctrl.targetLatLng.lng);
+        }
+      });
+      // init D3 for leafletMap
       ctrl.init = function(){
         ctrl.svg = d3.select(leafletMap.getPanes().overlayPane).append('svg');
         ctrl.g = ctrl.svg.append('g').attr('class', 'leaflet-zoom-hide');
@@ -97,7 +115,7 @@
         dataProvider.geoQuery('/query-shortest-path', customHeaders, dataSet)
                     .success(function(data, status, headers, config){
                       console.log(data);
-                      if(!!data){
+                      if(!!data && data.length > 0){
                         var newData = { "type": "FeatureCollection",
                                         "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
                                         "features": []}, maxLat, maxLng, minLat, minLng, count = 0;
