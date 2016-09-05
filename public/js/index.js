@@ -69,7 +69,26 @@
       var ctrl = this;
       ctrl.sourceLatLng = {lat: 37.783631, lng: -122.439514};
       ctrl.targetLatLng = {lat: 37.734909, lng: -122.466637};
+      ctrl.clickedSourceTargetLatLng = {source: {selected: true, latLng: {lat: null, lng: null}},
+                                        target: {selected: false, latLng: {lat: null, lng: null}}};
 
+      leafletMap.on('click', function(e){
+        if(ctrl.clickedSourceTargetLatLng.source.selected){
+          ctrl.clickedSourceTargetLatLng.source.latLng.lat = e.latlng.lat;
+          ctrl.clickedSourceTargetLatLng.source.latLng.lng = e.latlng.lng;
+          ctrl.clickedSourceTargetLatLng.target.selected = !ctrl.clickedSourceTargetLatLng.target.selected;
+          ctrl.clickedSourceTargetLatLng.source.selected = !ctrl.clickedSourceTargetLatLng.source.selected;
+          angular.element('#sourceLatLng').text(e.latlng.lat + ',' + e.latlng.lng);
+        }else if(ctrl.clickedSourceTargetLatLng.target.selected){
+          ctrl.clickedSourceTargetLatLng.target.latLng.lat = e.latlng.lat;
+          ctrl.clickedSourceTargetLatLng.target.latLng.lng = e.latlng.lng;
+          ctrl.clickedSourceTargetLatLng.target.selected = !ctrl.clickedSourceTargetLatLng.target.selected;
+          ctrl.clickedSourceTargetLatLng.source.selected = !ctrl.clickedSourceTargetLatLng.source.selected;
+          angular.element('#targetLatLng').text(e.latlng.lat + ',' + e.latlng.lng);
+        }
+        console.log(ctrl.clickedSourceTargetLatLng);
+      });
+      // init D3 for leafletMap
       ctrl.init = function(){
         ctrl.svg = d3.select(leafletMap.getPanes().overlayPane).append('svg');
         ctrl.g = ctrl.svg.append('g').attr('class', 'leaflet-zoom-hide');

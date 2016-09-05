@@ -13,11 +13,11 @@ block content
       div(class="col-lg-4 col-sm-12")
         div(class = "input-group")
           span(class = "input-group-addon") Origin
-          input(type = "text" class = "form-control" placeholder = "33.3452, -122.0198")
+          input(id="sourceLatLng" type = "text" class = "form-control" placeholder = "33.3452, -122.0198" disabled)
       div(class="col-lg-4 col-sm-12")
         div(class = "input-group")
           span(class = "input-group-addon") Destination
-          input(type = "text" class = "form-control" placeholder = "33.3452, -122.0198")
+          input(id="targetLatLng" type = "text" class = "form-control" placeholder = "33.3452, -122.0198" disabled)
       div(class="col-lg-4 col-sm-12")
         div(class = "input-group")
           input(type="button" class="btn btn-default" value="Submit" ng-click="ctrl.submitGeoQuery()")
