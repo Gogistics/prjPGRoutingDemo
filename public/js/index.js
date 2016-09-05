@@ -73,6 +73,7 @@
       ctrl.init = function(){
         ctrl.svg = d3.select(leafletMap.getPanes().overlayPane).append('svg');
         ctrl.g = ctrl.svg.append('g').attr('class', 'leaflet-zoom-hide');
+        ctrl.assetLayerGroup = new L.LayerGroup();
       };
 
       ctrl.submitGeoQuery = function(){
@@ -83,18 +84,6 @@
                         source_lng: ctrl.sourceLatLng.lng,
                         target_lat: ctrl.targetLatLng.lat,
                         target_lng: ctrl.targetLatLng.lng};
-
-        // getData() for testing; geoQuery() for query
-        /*
-        dataProvider.getData('/public/data/points.geojson', customHeaders, dataSet)
-                    .success(function(data, status, headers, config){
-                      console.log(data);
-                      if(!!data) ctrl.renderMapRoute(data);
-                    })
-                    .error(function(data, status, headers, config){
-                      console.log('Something went wrong!')
-                    });
-        */
 
         // query short path
         dataProvider.geoQuery('/query-shortest-path', customHeaders, dataSet)
@@ -135,6 +124,8 @@
       }
 
       ctrl.renderMapRoute = function(arg_collection, arg_max_min_lat_lng){
+        if(!!ctrl.assetLayerGroup) ctrl.assetLayerGroup.clearLayers();
+
         leafletMap.setView({lat: ( (Number(arg_max_min_lat_lng.maxLat) + Number(arg_max_min_lat_lng.minLat)) / 2).toFixed(5),
                             lng: ( (Number(arg_max_min_lat_lng.maxLng) + Number(arg_max_min_lat_lng.minLng)) / 2).toFixed(5) }, 13);
         var arg_data = arg_collection.features;
@@ -151,6 +142,7 @@
                       .y(function(d){
                         return applyLatLngToLayer(d).y;
                       });
+        ctrl.assetLayerGroup.addLayer(toLine);
 
         var ptFeatures = ctrl.g
                             .selectAll('circle')
@@ -159,6 +151,7 @@
                             .append('circle')
                             .attr('r', 3)
                             .attr('class', 'waypoints');
+        ctrl.assetLayerGroup.addLayer(ptFeatures);
 
         var linePath = ctrl.g
                           .selectAll('.lineConnect')
@@ -166,15 +159,16 @@
                           .enter()
                           .append('path')
                           .attr('class', 'lineConnect');
+        ctrl.assetLayerGroup.addLayer(linePath);
 
         var marker = ctrl.g
                         .append('circle')
                         .attr('r', 10)
                         .attr('id', 'marker')
                         .attr('class', 'travelMarker');
+        ctrl.assetLayerGroup.addLayer(marker);
 
         var originAndDestination = [arg_data[0], arg_data[arg_data.length - 1]];
-
         var begend = ctrl.g
                         .selectAll('.drinks')
                         .data(originAndDestination)
@@ -183,6 +177,7 @@
                         .attr('r', 5)
                         .style('fill', 'red')
                         .style('opacity', '.9');
+        ctrl.assetLayerGroup.addLayer(begend);
 
         var text = ctrl.g
                       .selectAll('text')
@@ -196,6 +191,7 @@
                       .attr('y', function(d){
                         return -10;
                       });
+        ctrl.assetLayerGroup.addLayer(text);
 
        leafletMap.on('viewreset', reset);
         reset();
@@ -268,8 +264,6 @@
           return leafletMap.latLngToLayerPoint(new L.LatLng(y, x));
         }
       }
-
-      console.log('index ctrl is ready');
     }]);
   }
 })(jQuery);
