@@ -69,8 +69,6 @@
       var ctrl = this;
       ctrl.sourceLatLng = {lat: 37.783631, lng: -122.439514, selected: true};
       ctrl.targetLatLng = {lat: 37.734909, lng: -122.466637, selected: false};
-      ctrl.clickedSourceTargetLatLng = {source: {selected: true, latLng: {lat: null, lng: null}},
-                                        target: {selected: false, latLng: {lat: null, lng: null}}};
 
       leafletMap.on('click', function(e){
         if(ctrl.sourceLatLng.selected){
