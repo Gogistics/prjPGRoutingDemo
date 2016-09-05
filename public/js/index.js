@@ -85,6 +85,7 @@
                         target_lng: ctrl.targetLatLng.lng};
 
         // getData() for testing; geoQuery() for query
+        /*
         dataProvider.getData('/public/data/points.geojson', customHeaders, dataSet)
                     .success(function(data, status, headers, config){
                       console.log(data);
@@ -93,12 +94,35 @@
                     .error(function(data, status, headers, config){
                       console.log('Something went wrong!')
                     });
+        */
 
-        // 
+        // query short path
         dataProvider.geoQuery('/query-shortest-path', customHeaders, dataSet)
                     .success(function(data, status, headers, config){
                       console.log(data);
-                      // if(!!data.request_status) ctrl.renderMapRoute(data.geoJson);
+                      if(!!data){
+                        var newData = { "type": "FeatureCollection",
+                                        "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+                                        "features": []}, maxLat, maxLng, minLat, minLng;
+
+                        for(var ith = 0, max = data.length; ith < max; ith++){
+                          if (!maxLat || geom['coordinates'][0][0][1] > maxLat) maxLat = geom['coordinates'][0][0][1];
+                          if (!maxLng || geom['coordinates'][0][0][0] > maxLng) maxLng = geom['coordinates'][0][0][0];
+                          if (!minLat || geom['coordinates'][0][0][1] < minLat) minLat = geom['coordinates'][0][0][1];
+                          if (!minLng || geom['coordinates'][0][0][0] < minLng) minLng = geom['coordinates'][0][0][0];
+
+                          var geom = JSON.parse(data[ith]['geom']);
+                          newData['features'].push({type: 'Feature',
+                                                    properties: { latitude: geom['coordinates'][0][0][1],
+                                                                  longitude: geom['coordinates'][0][0][0],
+                                                                  time: (ith + 1),
+                                                                  id: 'route',
+                                                                  name: data[ith]['name'] },
+                                                    geometry: { type: 'Point',
+                                                                coordinates: [geom['coordinates'][0][0][0], geom['coordinates'][0][0][1]]}});
+                        }
+                      }
+                      if(!!data.request_status) ctrl.renderMapRoute(newData, {maxLat: maxLat, maxLng: maxLng, minLat: minLat, minLng: minLng});
                     })
                     .error(function(data, status, headers, config){
                       console.log('Something went wrong!')
@@ -106,7 +130,9 @@
       }
       ctrl.submitGeoQuery();
 
-      ctrl.renderMapRoute = function(arg_collection){
+      ctrl.renderMapRoute = function(arg_collection, arg_max_min_lat_lng){
+        leafletMap.setView({lat: Math.toFixed(arg_max_min_lat_lng.maxLat + arg_max_min_lat_lng.minLat),
+                            lng: Math.toFixed(arg_max_min_lat_lng.maxLng + arg_max_min_lat_lng.minLng) }, 15);
         var arg_data = arg_collection.features;
         // render map
         var transform = d3.geo.transform({point: projectPoint}),
