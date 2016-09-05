@@ -106,12 +106,13 @@
                                         "features": []}, maxLat, maxLng, minLat, minLng;
 
                         for(var ith = 0, max = data.length; ith < max; ith++){
+                          var geom = JSON.parse(data[ith]['geom']);
+                          console.log(geom);
                           if (!maxLat || geom['coordinates'][0][0][1] > maxLat) maxLat = geom['coordinates'][0][0][1];
                           if (!maxLng || geom['coordinates'][0][0][0] > maxLng) maxLng = geom['coordinates'][0][0][0];
                           if (!minLat || geom['coordinates'][0][0][1] < minLat) minLat = geom['coordinates'][0][0][1];
                           if (!minLng || geom['coordinates'][0][0][0] < minLng) minLng = geom['coordinates'][0][0][0];
 
-                          var geom = JSON.parse(data[ith]['geom']);
                           newData['features'].push({type: 'Feature',
                                                     properties: { latitude: geom['coordinates'][0][0][1],
                                                                   longitude: geom['coordinates'][0][0][0],
@@ -121,18 +122,17 @@
                                                     geometry: { type: 'Point',
                                                                 coordinates: [geom['coordinates'][0][0][0], geom['coordinates'][0][0][1]]}});
                         }
+                        ctrl.renderMapRoute(newData, {maxLat: maxLat, maxLng: maxLng, minLat: minLat, minLng: minLng});
                       }
-                      if(!!data.request_status) ctrl.renderMapRoute(newData, {maxLat: maxLat, maxLng: maxLng, minLat: minLat, minLng: minLng});
                     })
                     .error(function(data, status, headers, config){
                       console.log('Something went wrong!')
                     });
       }
-      ctrl.submitGeoQuery();
 
       ctrl.renderMapRoute = function(arg_collection, arg_max_min_lat_lng){
-        leafletMap.setView({lat: Math.toFixed(arg_max_min_lat_lng.maxLat + arg_max_min_lat_lng.minLat),
-                            lng: Math.toFixed(arg_max_min_lat_lng.maxLng + arg_max_min_lat_lng.minLng) }, 15);
+        leafletMap.setView({lat: ( (Number(arg_max_min_lat_lng.maxLat) + Number(arg_max_min_lat_lng.minLat)) / 2).toFixed(5),
+                            lng: ( (Number(arg_max_min_lat_lng.maxLng) + Number(arg_max_min_lat_lng.minLng)) / 2).toFixed(5) }, 15);
         var arg_data = arg_collection.features;
         // render map
         var transform = d3.geo.transform({point: projectPoint}),
