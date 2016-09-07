@@ -273,6 +273,8 @@
 
 7. Start to construct the front-end map with D3 and Leaflet.js (Zevross provides a good example). In this demo, angular.js is used to construct the front-end MVC architecture.
 
+8. Extra Exercise- Query of Service Zones
+
 
 Ref.
 
@@ -290,9 +292,7 @@ Ref.
 
 [PostGIS Workshop-1](http://workshops.boundlessgeo.com/postgis-intro/)
 
-[PostGIS Workshop-2](http://workshops.boundlessgeo.com/)
-
-[PostGIS Workshop-3](http://workshops.boundlessgeo.com/tutorial-routing/)
+[PostGIS Workshop-2](http://workshops.boundlessgeo.com/tutorial-routing/)
 
 [docker cp](https://docs.docker.com/engine/reference/commandline/cp/)
 
