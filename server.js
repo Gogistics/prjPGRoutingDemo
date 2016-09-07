@@ -19,7 +19,6 @@ client.connect(function(err, client, done){
   if(err) console.log(err);
 });
 
-
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 app.set('view options', {pretty: true});
@@ -62,7 +61,6 @@ app.post('/query-nearest-neighbor', function(req, res){
   }
 });
 
-
 app.post('/query-shortest-path', function(req, res){
   var source_lat = req.body.source_lat,
       source_lng = req.body.source_lng,
@@ -77,7 +75,6 @@ app.post('/query-shortest-path', function(req, res){
     res.status(500).json({message: 'wrong lat and lng'});
   }
 });
-
 
 function searchNearestPoint(arg_lat, arg_lng, callback){
   var results = [];
@@ -120,6 +117,82 @@ function searchShortestPath(arg_source_lat_lng, arg_target_lat_lng, callback){
   });
 }
 
+/* query of service zones */
+app.post('/insert-new-service-zone', function(req, res){
+  var geojson = req.body;
+  insertNewZone(geojson, function(status_code, results){
+    res.status(status_code).send(results);
+  });
+});
+
+app.post('/query-service-zone', function(req, res){
+  var geoinfo = req.body;
+  isGivenPointwithinServiceZones(geoinfo, function(status_code, results){
+    res.status(status_code).send(results);
+  });
+});
+
+// init table service zones
+function initQueryServiceZonesTable(){
+  var query_str = "CREATE TABLE IF NOT EXISTS service_zones(name VARCHAR(128), zone GEOMETRY(POLYGON,4326));";
+  var query = client.query(query_str);
+
+  query.on('row', function(row){
+    console.log(row);
+  });
+
+  query.on('end', function(){
+    console.log('initQueryServiceZonesTable is done');
+  });
+}
+initQueryServiceZonesTable();
+
+function insertNewZone(arg_params, callback){
+  var results = [];
+  if( !(typeof arg_params.region_name === 'string' || arg_params.region_name instanceof String) ||
+      !(arg_params.polygon && (arg_params.polygon.constructor == Array || arg_params.polygon instanceof Array)) ){
+    callback(500, results);
+  }else{
+    var name = arg_params.region_name,
+        region = JSON.stringify(arg_params.polygon);
+
+    var command = 'INSERT INTO service_zones (name,zone) ' +
+                  'SELECT \'' + name + '\',ST_GeomFromGeoJSON(\'{"type":"Polygon","coordinates":[' + region + '],"crs":{"type":"name","properties":{"name":"EPSG:4326"}}}\') ' +
+                  'WHERE NOT EXISTS (SELECT name FROM service_zones WHERE name = \'' + name + '\');';
+    var query = client.query(command);
+
+    query.on('row', function(row){
+      results.push(row);
+    });
+
+    query.on('end', function(){
+      console.log('done...results will be return ASAP');
+      callback(200, results);
+    });
+  }
+}
+
+function isGivenPointwithinServiceZones(arg_params, callback){
+  var results = [];
+  if(!arg_params.lat || !arg_params.lng){
+    callback(500, results);
+  }else{
+    var lat = arg_params.lat, lng = arg_params.lng;
+    var command = 'SELECT name,ST_AsGeoJSON(zone) as region FROM service_zones WHERE ST_Contains(zone, ST_GeomFromText(\'POINT(' + lat + ' ' + lng + ')\', 4326));';
+
+    var query = client.query(command);
+    query.on('row', function(row){
+      results.push(row);
+    })
+
+    query.on('end', function(){
+      console.log('done...results will be return ASAP');
+      callback(200, results);
+    })
+  }
+}
+
+// have app listen to port
 app.listen(PORT, function(){
   console.log('Running at port:' + PORT);
 });
